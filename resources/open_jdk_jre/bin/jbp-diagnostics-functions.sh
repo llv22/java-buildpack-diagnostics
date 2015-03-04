@@ -7,12 +7,11 @@ upload_to_s3() {
     fi
     s3Bucket=$JBPDIAG_AWS_BUCKET
     s3Key=$JBPDIAG_AWS_ACCESS_KEY
-    s3Secret=$JBPDIAG_AWS_SECRET_KEY
     contentType="application/octet-stream"
     resource="/${s3Bucket}/$filename"
     dateValue=`date -R`
     stringToSign="PUT\n\n${contentType}\n${dateValue}\n${resource}"
-    signature=`echo -en ${stringToSign} | openssl sha1 -hmac ${s3Secret} -binary | base64`
+    signature=`sign_s3_string "$stringToSign"`
     curl -X PUT -T "${filepath}" \
       -H "Host: ${s3Bucket}.s3.amazonaws.com" \
       -H "Date: ${dateValue}" \
@@ -21,17 +20,22 @@ upload_to_s3() {
       https://${s3Bucket}.s3.amazonaws.com/${filename}
 }
 
+sign_s3_string() {
+    stringToSign="$1"
+    s3Secret=$JBPDIAG_AWS_SECRET_KEY
+    echo -en "${stringToSign}" | openssl sha1 -hmac ${s3Secret} -binary | base64
+}
+
 upload_stdin_to_s3() {
     filename="$1"
     contentLength="$2"
     s3Bucket=$JBPDIAG_AWS_BUCKET
     s3Key=$JBPDIAG_AWS_ACCESS_KEY
-    s3Secret=$JBPDIAG_AWS_SECRET_KEY
     contentType="application/octet-stream"
     resource="/${s3Bucket}/$filename"
     dateValue=`date -R`
     stringToSign="PUT\n\n${contentType}\n${dateValue}\n${resource}"
-    signature=`echo -en ${stringToSign} | openssl sha1 -hmac ${s3Secret} -binary | base64`
+    signature=`sign_s3_string "$stringToSign"`
     curl -X PUT --data-binary @- \
       -H "Host: ${s3Bucket}.s3.amazonaws.com" \
       -H "Date: ${dateValue}" \
@@ -45,11 +49,10 @@ calculate_presigned_s3_url() {
     filename="$1"
     s3Bucket=$JBPDIAG_AWS_BUCKET
     s3Key=$JBPDIAG_AWS_ACCESS_KEY
-    s3Secret=$JBPDIAG_AWS_SECRET_KEY
     resource="/${s3Bucket}/$filename"
     expires=`date --date="+48 hours" +"%s"`
     stringToSign="GET\n\n\n${expires}\n${resource}"
-    signature=`echo -en ${stringToSign} | openssl sha1 -hmac ${s3Secret} -binary | base64`
+    signature=`sign_s3_string "$stringToSign"`
     echo "https://${s3Bucket}.s3.amazonaws.com/${filename}?AWSAccessKeyId=${s3Key}&Expires=${expires}&Signature=${signature}"
 }
 
