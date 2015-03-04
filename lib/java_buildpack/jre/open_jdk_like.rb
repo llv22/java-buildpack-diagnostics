@@ -55,7 +55,7 @@ module JavaBuildpack
       def release
         @droplet.java_opts
           .add_system_property('java.io.tmpdir', '$TMPDIR')
-          .add_option('-XX:+HeapDumpOnOutOfMemoryError')
+          .push('-XX:+HeapDumpOnOutOfMemoryError')
           .add_option('-XX:HeapDumpPath', '$PWD/oom_heapdump.hprof' )
           .add_option('-XX:OnOutOfMemoryError', killjava)
           .concat memory
