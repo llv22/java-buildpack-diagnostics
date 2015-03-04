@@ -20,3 +20,12 @@ upload_to_s3() {
       -H "Authorization: AWS ${s3Key}:${signature}" \
       https://${s3Bucket}.s3.amazonaws.com/${filename}
 }
+
+upload_oom_heapdump_to_s3() {
+    heapdumpfile=$PWD/oom_heapdump.hprof
+    if [ -e $heapdumpfile ]; then
+        gzip $heapdumpfile
+        filename="oom_heapdump_$(date +"%s").hprof.gz"
+        upload_to_s3 ${heapdumpfile}.gz $filename && rm ${heapdumpfile}.gz
+    fi
+}
