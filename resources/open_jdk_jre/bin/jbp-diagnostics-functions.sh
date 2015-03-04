@@ -21,11 +21,42 @@ upload_to_s3() {
       https://${s3Bucket}.s3.amazonaws.com/${filename}
 }
 
+upload_stdin_to_s3() {
+    filename="$1"
+    contentLength="$2"
+    s3Bucket=$JBPDIAG_AWS_BUCKET
+    s3Key=$JBPDIAG_AWS_ACCESS_KEY
+    s3Secret=$JBPDIAG_AWS_SECRET_KEY
+    contentType="application/octet-stream"
+    resource="/${s3Bucket}/$filename"
+    dateValue=`date -R`
+    stringToSign="PUT\n\n${contentType}\n${dateValue}\n${resource}"
+    signature=`echo -en ${stringToSign} | openssl sha1 -hmac ${s3Secret} -binary | base64`
+    curl -X PUT --data-binary @- \
+      -H "Host: ${s3Bucket}.s3.amazonaws.com" \
+      -H "Date: ${dateValue}" \
+      -H "Content-Type: ${contentType}" \
+      -H "Content-Length: ${contentLength}" \
+      -H "Authorization: AWS ${s3Key}:${signature}" \
+      https://${s3Bucket}.s3.amazonaws.com/${filename}
+}
+
 upload_oom_heapdump_to_s3() {
+    usetempfile="$1"
     heapdumpfile=$PWD/oom_heapdump.hprof
     if [ -e $heapdumpfile ]; then
-        gzip $heapdumpfile
         filename="oom_heapdump_$(date +"%s").hprof.gz"
-        upload_to_s3 ${heapdumpfile}.gz $filename && rm ${heapdumpfile}.gz
+        if [[ $usetempfile == 1 ]]; then
+            # usage of temporary file is allowed
+            echo "Compressing $heapdumpfile"
+            gzip $heapdumpfile
+            echo "Uploading to S3"
+            upload_to_s3 ${heapdumpfile}.gz $filename && rm ${heapdumpfile}.gz
+        else
+            echo "Calculating compressed size first to minimize disk space usage"
+            gzippedsize=`cat $heapdumpfile | gzip -c | wc -c | awk '{print $1}'`
+            echo "Compressing and uploading $gzippedsize bytes to S3"
+            cat $heapdumpfile | gzip -c | upload_stdin_to_s3 $filename $gzippedsize && rm $heapdumpfile
+        fi
     fi
 }
