@@ -22,6 +22,7 @@ upload_to_s3() {
 
 sign_s3_string() {
     stringToSign="$1"
+    >&2 echo "stringToSign '$stringToSign'"
     s3Secret=$JBPDIAG_AWS_SECRET_KEY
     echo -en "${stringToSign}" | openssl sha1 -hmac ${s3Secret} -binary | base64
 }
