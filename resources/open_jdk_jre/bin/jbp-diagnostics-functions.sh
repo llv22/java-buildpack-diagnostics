@@ -44,7 +44,7 @@ upload_stdin_to_s3() {
 upload_oom_heapdump_to_s3() {
     usetempfile="$1"
     heapdumpfile=$PWD/oom_heapdump.hprof
-    if [ -e $heapdumpfile ]; then
+    if [[ -e $heapdumpfile && -n "$JBPDIAG_AWS_BUCKET" ]]; then
         filename="oom_heapdump_$(date +"%s").hprof.gz"
         if [[ $usetempfile == 1 ]]; then
             # usage of temporary file is allowed
