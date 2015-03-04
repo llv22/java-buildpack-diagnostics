@@ -27,6 +27,10 @@ sign_s3_string() {
     echo -en "${stringToSign}" | openssl sha1 -hmac ${s3Secret} -binary | base64
 }
 
+jbp_urlencode() {
+    python -c "import sys,urllib; print urllib.quote(sys.argv[1])" "$1"
+}
+
 upload_stdin_to_s3() {
     filename="$1"
     contentLength="$2"
@@ -54,7 +58,7 @@ calculate_presigned_s3_url() {
     expires=`date --date="+48 hours" +"%s"`
     stringToSign="GET\n\n\n${expires}\n${resource}"
     signature=`sign_s3_string "$stringToSign"`
-    echo "https://${s3Bucket}.s3.amazonaws.com/${filename}?AWSAccessKeyId=${s3Key}&Expires=${expires}&Signature=${signature}"
+    echo "https://${s3Bucket}.s3.amazonaws.com/${filename}?AWSAccessKeyId=${s3Key}&Expires=${expires}&Signature=`jbp_urlencode ${signature}`"
 }
 
 upload_oom_heapdump_to_s3() {
