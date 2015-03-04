@@ -19,6 +19,10 @@
 
 set -e
 
+SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+. $SCRIPTDIR/jbp-diagnostics-functions.sh
+upload_oom_heapdump_to_s3
+
 echo "
 Process Status (Before)
 =======================
