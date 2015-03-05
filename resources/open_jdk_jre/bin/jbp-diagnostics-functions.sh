@@ -5,6 +5,7 @@ upload_to_s3() {
     if [[ -z "$filename" ]]; then
         filename=$(basename "$filepath")
     fi
+    s3Endpoint="${JBPDIAG_AWS_ENDPOINT:-s3.amazonaws.com}"
     s3Bucket=$JBPDIAG_AWS_BUCKET
     s3Key=$JBPDIAG_AWS_ACCESS_KEY
     contentType="application/octet-stream"
@@ -13,11 +14,11 @@ upload_to_s3() {
     stringToSign="PUT\n\n${contentType}\n${dateValue}\n${resource}"
     signature=`sign_s3_string "$stringToSign"`
     curl -X PUT -T "${filepath}" \
-      -H "Host: ${s3Bucket}.s3.amazonaws.com" \
+      -H "Host: ${s3Bucket}.${s3Endpoint}" \
       -H "Date: ${dateValue}" \
       -H "Content-Type: ${contentType}" \
       -H "Authorization: AWS ${s3Key}:${signature}" \
-      https://${s3Bucket}.s3.amazonaws.com/${filename}
+      https://${s3Bucket}.${s3Endpoint}/${filename}
 }
 
 sign_s3_string() {
@@ -34,6 +35,7 @@ jbp_urlencode() {
 upload_stdin_to_s3() {
     filename="$1"
     contentLength="$2"
+    s3Endpoint="${JBPDIAG_AWS_ENDPOINT:-s3.amazonaws.com}"
     s3Bucket=$JBPDIAG_AWS_BUCKET
     s3Key=$JBPDIAG_AWS_ACCESS_KEY
     contentType="application/octet-stream"
@@ -42,23 +44,24 @@ upload_stdin_to_s3() {
     stringToSign="PUT\n\n${contentType}\n${dateValue}\n${resource}"
     signature=`sign_s3_string "$stringToSign"`
     curl -X PUT --data-binary @- \
-      -H "Host: ${s3Bucket}.s3.amazonaws.com" \
+      -H "Host: ${s3Bucket}.${s3Endpoint}" \
       -H "Date: ${dateValue}" \
       -H "Content-Type: ${contentType}" \
       -H "Content-Length: ${contentLength}" \
       -H "Authorization: AWS ${s3Key}:${signature}" \
-      https://${s3Bucket}.s3.amazonaws.com/${filename}
+      https://${s3Bucket}.${s3Endpoint}/${filename}
 }
 
 calculate_presigned_s3_url() {
     filename="$1"
+    s3Endpoint="${JBPDIAG_AWS_ENDPOINT:-s3.amazonaws.com}"
     s3Bucket=$JBPDIAG_AWS_BUCKET
     s3Key=$JBPDIAG_AWS_ACCESS_KEY
     resource="/${s3Bucket}/$filename"
     expires=`date --date="+48 hours" +"%s"`
     stringToSign="GET\n\n\n${expires}\n${resource}"
     signature=`sign_s3_string "$stringToSign"`
-    echo "https://${s3Bucket}.s3.amazonaws.com/${filename}?AWSAccessKeyId=${s3Key}&Expires=${expires}&Signature=`jbp_urlencode ${signature}`"
+    echo "https://${s3Bucket}.${s3Endpoint}/${filename}?AWSAccessKeyId=${s3Key}&Expires=${expires}&Signature=`jbp_urlencode ${signature}`"
 }
 
 upload_oom_heapdump_to_s3() {
