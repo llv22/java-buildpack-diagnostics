@@ -17,38 +17,23 @@
 
 # Kill script for use as the parameter of OpenJDK's -XX:OnOutOfMemoryError
 
-set -e
+# send SIGQUIT (3) signal which triggers a threaddump, don't kill the process
+pkill -3 -f .*-XX:OnOutOfMemoryError=.*killjava.*
+
+echo "
+Process Status
+==============
+$(ps -ef)
+
+ulimit
+======
+$(ulimit -a)
+
+Free Disk Space
+===============
+$(df -h)
+"
 
 SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 . $SCRIPTDIR/jbp-diagnostics-functions.sh
 upload_oom_heapdump_to_s3
-
-echo "
-Process Status (Before)
-=======================
-$(ps -ef)
-
-ulimit (Before)
-===============
-$(ulimit -a)
-
-Free Disk Space (Before)
-========================
-$(df -h)
-"
-
-pkill -9 -f .*-XX:OnOutOfMemoryError=.*killjava.*
-
-echo "
-Process Status (After)
-======================
-$(ps -ef)
-
-ulimit (After)
-==============
-$(ulimit -a)
-
-Free Disk Space (After)
-=======================
-$(df -h)
-"
