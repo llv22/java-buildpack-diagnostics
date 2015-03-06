@@ -20,6 +20,8 @@ repository_root: "{default.repository.root}/openjdk/{platform}/{architecture}"
 version: 1.8.0_+
 memory_sizes:
   metaspace: 140m..200m
+  # workaround for https://github.com/cloudfoundry/java-buildpack/issues/157
+  native: 250m
   # permgen: 64m..
 memory_heuristics:
   heap: 70
