@@ -21,6 +21,7 @@
     <Service name='Catalina'>
         <Connector port='${http.port}' bindOnInit="false" proxyName="${Server.Service.Connector.proxyName}" proxyPort="443" secure="true" scheme="https"
             connectionTimeout="5000" socket.soReuseAddress="true" socket.soKeepAlive="true" socket.tcpNoDelay="true"
+            maxThreads="30" minSpareThreads="15"
             />
 
         <Engine defaultHost='localhost' name='Catalina'>
