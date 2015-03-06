@@ -21,11 +21,11 @@ version: 1.8.0_+
 memory_sizes:
   metaspace: 140m..200m
   # workaround for https://github.com/cloudfoundry/java-buildpack/issues/157
-  native: 250m
+  native: 300m..
 # permgen: 64m..
 memory_heuristics:
   heap: 70
   metaspace: 15
 # permgen: 10
   stack: 5
-  native: 10
+  native: 15
