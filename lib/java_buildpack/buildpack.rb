@@ -74,7 +74,7 @@ module JavaBuildpack
 
       component_detection('JRE', @jres, true).first.release
       component_detection('framework', @frameworks, false).each(&:release)
-      command = container.release
+      command = container.respond_to?(:main_release) ? container.main_release : container.release
 
       payload = {
         'addons'                => [],
