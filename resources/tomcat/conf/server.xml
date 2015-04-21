@@ -19,7 +19,8 @@
 <Server port='-1'>
 
     <Service name='Catalina'>
-        <Connector port='${http.port}' bindOnInit="false" connectionTimeout="20000" proxyName="${Server.Service.Connector.proxyName}" proxyPort="443" secure="true" scheme="https"/>
+        <Connector port='${http.port}' bindOnInit="false" connectionTimeout="20000" proxyName="${Server.Service.Connector.proxyName}" proxyPort="443" secure="true" scheme="https"
+            maxThreads="30" minSpareThreads="15" />
 
         <Engine defaultHost='localhost' name='Catalina'>
             <Valve className="org.apache.catalina.valves.RemoteIpValve"/>
