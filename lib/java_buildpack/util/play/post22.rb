@@ -1,6 +1,6 @@
 # Encoding: utf-8
 # Cloud Foundry Java Buildpack
-# Copyright (c) 2013 the original author or authors.
+# Copyright 2013-2016 the original author or authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ module JavaBuildpack
             fail "Invalid Java option contains more than one option: '#{option}'"
           end
 
-          java_opts.map { |java_opt| "-J#{java_opt}" }
+          java_opts.map { |option| option == '$CALCULATED_MEMORY' ? '${CALCULATED_MEMORY//-/-J-}' : "-J#{option}" }
         end
 
         # (see JavaBuildpack::Util::Play::Base#lib_dir)

@@ -1,6 +1,6 @@
 # Encoding: utf-8
 # Cloud Foundry Java Buildpack
-# Copyright 2013-2015 the original author or authors.
+# Copyright 2013-2016 the original author or authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ module JavaBuildpack
         # @param [Hash] configuration the configuration
         # @option configuration [String] :repository_root the root directory of the repository
         # @option configuration [String] :version the version of the file to resolve
-        # @param [Block, nil] version_validator an optional version validation block
+        # @yield [Block] optional version_validator to yield to
         # @return [String] the URI of the chosen version of the file
         # @return [JavaBuildpack::Util::TokenizedVersion] the chosen version of the file
         def find_item(component_name, configuration)

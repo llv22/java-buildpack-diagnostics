@@ -1,6 +1,6 @@
 # Encoding: utf-8
 # Cloud Foundry Java Buildpack
-# Copyright 2013-2015 the original author or authors.
+# Copyright 2013-2016 the original author or authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ module JavaBuildpack
         i          = 0
         while comparison == 0 && i < 3
           comparison = self[i].to_i <=> other[i].to_i
-          i          += 1
+          i += 1
         end
         comparison = qualifier_compare(non_nil_qualifier(self[3]), non_nil_qualifier(other[3])) if comparison == 0
 
@@ -84,7 +84,8 @@ module JavaBuildpack
 
       def major_or_minor_and_tail(s)
         if s.nil? || s.empty?
-          major_or_minor, tail = nil, nil
+          major_or_minor = nil
+          tail = nil
         else
           fail "Invalid version '#{s}': must not end in '.'" if s[-1] == '.'
           fail "Invalid version '#{s}': missing component" if s =~ /\.[\._]/
@@ -100,7 +101,8 @@ module JavaBuildpack
 
       def micro_and_qualifier(s)
         if s.nil? || s.empty?
-          micro, qualifier = nil, nil
+          micro = nil
+          qualifier = nil
         else
           fail "Invalid version '#{s}': must not end in '_'" if s[-1] == '_'
           tokens = s.match(/^([^\_]+)(?:_(.*))?/)
@@ -124,7 +126,7 @@ module JavaBuildpack
         i = 0
         until comparison != 0 || i == minimum_qualifier_length(a, b)
           comparison = char_compare(a[i], b[i])
-          i          += 1
+          i += 1
         end
 
         comparison = a.length <=> b.length if comparison == 0

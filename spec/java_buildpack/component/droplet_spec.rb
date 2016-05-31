@@ -1,6 +1,6 @@
 # Encoding: utf-8
 # Cloud Foundry Java Buildpack
-# Copyright 2013-2015 the original author or authors.
+# Copyright 2013-2016 the original author or authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,6 +39,10 @@ describe JavaBuildpack::Component::Droplet do
 
   it 'returns java_opts' do
     expect(droplet.java_opts).to equal(java_opts)
+  end
+
+  it 'returns environment_variables' do
+    expect(droplet.environment_variables).to equal(environment_variables)
   end
 
   it 'returns an existent child if in application' do

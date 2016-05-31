@@ -1,6 +1,6 @@
 # Encoding: utf-8
 # Cloud Foundry Java Buildpack
-# Copyright 2013-2015 the original author or authors.
+# Copyright 2013-2016 the original author or authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,10 +16,16 @@
 
 require 'spec_helper'
 require 'java_buildpack/component/immutable_java_home'
+require 'java_buildpack/util/tokenized_version'
 
 describe JavaBuildpack::Component::ImmutableJavaHome do
 
-  let(:delegate) { double('delegate', root: Pathname.new('test-java-home'), version: %w(1 2 3 u04)) }
+  let(:delegate) do
+    double('delegate',
+           root:             Pathname.new('test-java-home'),
+           java_8_or_later?: true,
+           version:          JavaBuildpack::Util::TokenizedVersion.new('1.2.3_u04'))
+  end
 
   let(:immutable_java_home) { described_class.new delegate, Pathname.new('.') }
 
@@ -28,11 +34,15 @@ describe JavaBuildpack::Component::ImmutableJavaHome do
   end
 
   it 'returns the qualified delegate root' do
-    expect(immutable_java_home.root).to eq('$PWD/test-java-home')
+    expect(immutable_java_home.root.to_s).to eq('test-java-home')
   end
 
   it 'returns the delegate version' do
     expect(immutable_java_home.version).to eq(%w(1 2 3 u04))
+  end
+
+  it 'returns the delegate Java 8 or later' do
+    expect(immutable_java_home.java_8_or_later?).to be
   end
 
 end

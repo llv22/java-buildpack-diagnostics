@@ -1,6 +1,6 @@
 # Encoding: utf-8
 # Cloud Foundry Java Buildpack
-# Copyright 2013-2015 the original author or authors.
+# Copyright 2013-2016 the original author or authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ module JavaBuildpack
       # @param [Pathname] target_directory the directory to store the JAR file in.  Defaults to the component's sandbox.
       # @param [String] name an optional name for the download.  Defaults to +@component_name+.
       # @return [Void]
-      def download_jar(jar_name = jar_name, target_directory = @droplet.sandbox, name = @component_name)
+      def download_jar(jar_name = self.jar_name, target_directory = @droplet.sandbox, name = @component_name)
         super(@version, @uri, jar_name, target_directory, name)
       end
 

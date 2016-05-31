@@ -1,6 +1,6 @@
 # Encoding: utf-8
 # Cloud Foundry Java Buildpack
-# Copyright 2013-2015 the original author or authors.
+# Copyright 2013-2016 the original author or authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -170,9 +170,21 @@ describe JavaBuildpack::Util::Cache::DownloadCache do
     expect { |b| download_cache.get uri, &b }.to yield_file_with_content(/foo-cached/)
   end
 
+  it 'ignores incorrect size when encoded' do
+    stub_request(:get, uri)
+      .to_return(status: 200, body: 'foo-cac', headers: { Etag:              'foo-etag',
+                                                          'Content-Encoding' => 'gzip',
+                                                          'Last-Modified'    => 'foo-last-modified',
+                                                          'Content-Length'   => 10 })
+
+    touch immutable_cache_root, 'cached', 'old-foo-cached'
+
+    expect { |b| download_cache.get uri, &b }.to yield_file_with_content(/foo-cac/)
+  end
+
   context do
 
-    let(:environment) { { 'http_proxy' => 'http://proxy:9000' } }
+    let(:environment) { { 'http_proxy' => 'http://proxy:9000', 'HTTP_PROXY' => nil } }
 
     it 'uses http_proxy if specified' do
       stub_request(:get, uri)
@@ -189,7 +201,7 @@ describe JavaBuildpack::Util::Cache::DownloadCache do
 
   context do
 
-    let(:environment) { { 'HTTP_PROXY' => 'http://proxy:9000' } }
+    let(:environment) { { 'HTTP_PROXY' => 'http://proxy:9000', 'http_proxy' => nil } }
 
     it 'uses HTTP_PROXY if specified' do
       stub_request(:get, uri)
@@ -206,7 +218,7 @@ describe JavaBuildpack::Util::Cache::DownloadCache do
 
   context do
 
-    let(:environment) { { 'https_proxy' => 'http://proxy:9000' } }
+    let(:environment) { { 'https_proxy' => 'http://proxy:9000', 'HTTPS_PROXY' => nil } }
 
     it 'uses https_proxy if specified and URL is secure' do
       stub_request(:get, uri_secure)
@@ -223,7 +235,7 @@ describe JavaBuildpack::Util::Cache::DownloadCache do
 
   context do
 
-    let(:environment) { { 'HTTPS_PROXY' => 'http://proxy:9000' } }
+    let(:environment) { { 'HTTPS_PROXY' => 'http://proxy:9000', 'https_proxy' => nil } }
 
     it 'uses HTTPS_PROXY if specified and URL is secure' do
       stub_request(:get, uri_secure)

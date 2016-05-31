@@ -1,6 +1,6 @@
 # Encoding: utf-8
 # Cloud Foundry Java Buildpack
-# Copyright 2013-2015 the original author or authors.
+# Copyright 2013-2016 the original author or authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,15 +39,22 @@ module JavaBuildpack
       #
       # @return [String] the path of +JAVA_HOME+ as an environment variable
       def as_env_var
-        "JAVA_HOME=#{root}"
+        "JAVA_HOME=#{qualify_path root}"
       end
 
-      # @return [String] the root of the droplet's +JAVA_HOME+ formatted as +$PWD/<value>+
+      # Whether or not the version of Java is 8 or later
+      #
+      # @return [Boolean] +true+ iff the version is 1.8.0 or later
+      def java_8_or_later?
+        @delegate.java_8_or_later?
+      end
+
+      # @return [Pathname] the root of the droplet's +JAVA_HOME+
       def root
-        qualify_path @delegate.root
+        @delegate.root
       end
 
-      # @return [String] the version of Java being used by the droplet
+      # @return # @return [JavaBuildpack::Util::TokenizedVersion] the tokenized droplet's +VERSION+
       def version
         @delegate.version
       end

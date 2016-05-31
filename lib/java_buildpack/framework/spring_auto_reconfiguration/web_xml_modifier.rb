@@ -1,6 +1,6 @@
 # Encoding: utf-8
 # Cloud Foundry Java Buildpack
-# Copyright 2013-2015 the original author or authors.
+# Copyright 2013-2016 the original author or authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -95,8 +95,13 @@ module JavaBuildpack
       end
 
       def create_param(root, param_type, name, value)
-        param = REXML::Element.new param_type, root
-
+        load_on_startup = xpath(root, 'load-on-startup')
+        if load_on_startup.any?
+          param = REXML::Element.new param_type
+          load_on_startup.first.previous_sibling = param
+        else
+          param = REXML::Element.new param_type, root
+        end
         param_name = REXML::Element.new 'param-name', param
         REXML::Text.new name, true, param_name
 

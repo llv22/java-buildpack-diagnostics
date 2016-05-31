@@ -1,6 +1,6 @@
 # Encoding: utf-8
 # Cloud Foundry Java Buildpack
-# Copyright 2013-2015 the original author or authors.
+# Copyright 2013-2016 the original author or authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -69,8 +69,16 @@ describe JavaBuildpack::Container::SpringBoot do
   it 'returns command',
      app_fixture: 'container_spring_boot_staged' do
 
-    expect(component.release).to eq("SERVER_PORT=$PORT #{java_home.as_env_var} JAVA_OPTS=\"test-opt-2 test-opt-1\" " \
-                                    '$PWD/bin/application')
+    expect(component.release).to eq("#{env_vars_str} #{java_home.as_env_var} " \
+                                      "JAVA_OPTS=#{java_opts_str} exec $PWD/bin/application")
+  end
+
+  def env_vars_str
+    "#{environment_variables.join(' ')}"
+  end
+
+  def java_opts_str
+    "\"#{java_opts.join(' ')}\""
   end
 
 end

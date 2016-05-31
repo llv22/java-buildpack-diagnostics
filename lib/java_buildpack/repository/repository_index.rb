@@ -1,6 +1,6 @@
 # Encoding: utf-8
 # Cloud Foundry Java Buildpack
-# Copyright 2013-2015 the original author or authors.
+# Copyright 2013-2016 the original author or authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -85,7 +85,8 @@ module JavaBuildpack
         redhat_release = Pathname.new('/etc/redhat-release')
 
         if redhat_release.exist?
-          "centos#{redhat_release.read.match(/CentOS release (\d)/)[1]}"
+          tokens = redhat_release.read.match(/(\w+) (?:Linux )?release (\d+)/)
+          "#{tokens[1].downcase}#{tokens[2]}"
         elsif `uname -s` =~ /Darwin/
           'mountainlion'
         elsif !`which lsb_release 2> /dev/null`.empty?

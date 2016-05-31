@@ -1,6 +1,6 @@
 # Encoding: utf-8
 # Cloud Foundry Java Buildpack
-# Copyright 2013-2015 the original author or authors.
+# Copyright 2013-2016 the original author or authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,8 +39,7 @@ describe JavaBuildpack::Repository::ConfiguredItem do
     details = described_class.find_item('Test',
                                         'repository_root'      => 'test-repository-root',
                                         'java.runtime.version' => 'test-java-runtime-version',
-                                        'version'              => '1.7.0'
-    )
+                                        'version'              => '1.7.0')
 
     expect(details[0]).to eq(resolved_version)
     expect(details[1]).to eq(resolved_uri)
@@ -49,8 +48,7 @@ describe JavaBuildpack::Repository::ConfiguredItem do
   it 'resolves a configuration version if specified' do
     details = described_class.find_item('Test',
                                         'repository_root' => 'test-repository-root',
-                                        'version'         => '1.7.0'
-    )
+                                        'version'         => '1.7.0')
 
     expect(details[0]).to eq(resolved_version)
     expect(details[1]).to eq(resolved_uri)
@@ -59,16 +57,14 @@ describe JavaBuildpack::Repository::ConfiguredItem do
   it 'drives the version validator block if supplied' do
     described_class.find_item('Test',
                               'repository_root' => 'test-repository-root',
-                              'version'         => '1.7.0'
-    ) do |version|
+                              'version'         => '1.7.0') do |version|
       expect(version).to eq(JavaBuildpack::Util::TokenizedVersion.new('1.7.0'))
     end
   end
 
   it 'resolves nil if no version is specified' do
     details = described_class.find_item('Test',
-                                        'repository_root' => 'test-repository-root'
-    )
+                                        'repository_root' => 'test-repository-root')
 
     expect(details[0]).to eq(resolved_version)
     expect(details[1]).to eq(resolved_uri)
