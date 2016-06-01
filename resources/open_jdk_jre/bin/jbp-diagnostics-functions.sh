@@ -67,7 +67,6 @@ calculate_presigned_s3_url() {
 upload_oom_heapdump_to_s3() {
     usetempfile="$1"
     heapdumpfile=$PWD/oom_heapdump.hprof
-    #heapdumpfile=/home/vcap/app/oom_heapdump.hprof
     if [[ -e $heapdumpfile && -n "$JBPDIAG_AWS_BUCKET" ]]; then
         filename="oom_heapdump_$(date +"%s").hprof.gz"
         s3_presign_url=`calculate_presigned_s3_url $filename`
@@ -84,34 +83,5 @@ upload_oom_heapdump_to_s3() {
             echo "Compressing and uploading $gzippedsize bytes to S3. Presigned access url: $s3_presign_url"
             cat $heapdumpfile | gzip -c | upload_stdin_to_s3 $filename $gzippedsize && rm $heapdumpfile
         fi
-    fi
-}
-
-create_stats_file() {
-	statsfile=$PWD/$1
-	echo echo "
-	Process Status (Before)
-	=======================
-	$(ps -ef)
-
-	ulimit (Before)
-	===============
-	$(ulimit -a)
-
-	Free Disk Space (Before)
-	========================
-	$(df -h)
-	" >> $statsfile
-}
-
-upload_file_to_s3() {
-    echo "Copying mem stats file"
-	statsfile=$PWD/$1
-    if [[ -n "$JBPDIAG_AWS_BUCKET" ]]; then
-        filename="oom_$(date +"%s")_file.txt.gz"
-		
-		echo "Calculating $1 compressed size first to minimize disk space usage"
-		gzippedsize=`cat $statsfile | gzip -c | wc -c | awk '{print $1}'`
-		cat $statsfile | gzip -c | upload_stdin_to_s3 $filename $gzippedsize && rm $statsfile
     fi
 }
