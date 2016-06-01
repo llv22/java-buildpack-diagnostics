@@ -21,10 +21,10 @@ set -e
 
 SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 . $SCRIPTDIR/jbp-diagnostics-functions.sh
-upload_oom_heapdump_to_s3 1
 create_stats_file $PWD/stats.txt
 upload_file_to_s3 $PWD/stats.txt
 upload_file_to_s3 /home/vcap/app/jvm-gc.log
+upload_oom_heapdump_to_s3 1
 
 echo "
 Process Status (Before)
@@ -40,7 +40,7 @@ Free Disk Space (Before)
 $(df -h)
 "
 
-#pkill -9 -f .*-XX:OnOutOfMemoryError=.*killjava.*
+pkill -9 -f .*-XX:OnOutOfMemoryError=.*killjava.*
 
 echo "
 Process Status (After)
