@@ -88,7 +88,7 @@ upload_oom_heapdump_to_s3() {
 }
 
 create_stats_file() {
-	statsfile=$PWD/$1
+	statsfile=$1
 	echo echo "
 	Process Status (Before)
 	=======================
@@ -106,7 +106,7 @@ create_stats_file() {
 
 upload_file_to_s3() {
     echo "Copying mem stats file"
-	statsfile=$PWD/$1
+	statsfile=$1
     if [[ -n "$JBPDIAG_AWS_BUCKET" ]]; then
         filename="oom_$(date +"%s")_file.txt.gz"
 		
