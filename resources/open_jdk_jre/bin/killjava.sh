@@ -21,7 +21,10 @@ set -e
 
 SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 . $SCRIPTDIR/jbp-diagnostics-functions.sh
-upload_oom_heapdump_to_s3
+upload_oom_heapdump_to_s3 1
+create_stats_file stats.txt
+upload_file_to_s3 stats.txt
+upload_file_to_s3 /home/vcap/app/jvm-gc.log
 
 echo "
 Process Status (Before)
