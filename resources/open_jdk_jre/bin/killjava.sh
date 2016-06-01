@@ -13,7 +13,7 @@
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
-# limitations under the License.
+# limitations under the License. 
 
 # Kill script for use as the parameter of OpenJDK's -XX:OnOutOfMemoryError
 
@@ -21,10 +21,12 @@ set -e
 
 SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 . $SCRIPTDIR/jbp-diagnostics-functions.sh
-create_stats_file $PWD/stats.txt
-upload_file_to_s3 $PWD/stats.txt
+
+create_stats_file $PWD/$APP_NAME/stats.txt
+upload_file_to_s3 $PWD/$APP_NAME/stats.txt
 upload_file_to_s3 /home/vcap/app/jvm-gc.log
-upload_oom_heapdump_to_s3 1
+upload_oom_heapdump_to_s3 /home/vcap/app/oom_heapdump.hprof
+
 
 echo "
 Process Status (Before)

@@ -1,10 +1,6 @@
 # based on blog post code http://tmont.com/blargh/2014/1/uploading-to-s3-in-bash
 upload_to_s3() {
-    filepath="$1"
-    filename="$2"
-    if [[ -z "$filename" ]]; then
-        filename=$(basename "$filepath")
-    fi
+    filename="$1"
     s3Endpoint="${JBPDIAG_AWS_ENDPOINT:-s3.amazonaws.com}"
     s3Bucket=$JBPDIAG_AWS_BUCKET
     s3Key=$JBPDIAG_AWS_ACCESS_KEY
@@ -13,12 +9,12 @@ upload_to_s3() {
     dateValue=`date -R`
     stringToSign="PUT\n\n${contentType}\n${dateValue}\n${resource}"
     signature=`sign_s3_string "$stringToSign"`
-    curl -X PUT -T "${filepath}" \
+    curl -X PUT -T "${filename}" \
       -H "Host: ${s3Bucket}.${s3Endpoint}" \
       -H "Date: ${dateValue}" \
       -H "Content-Type: ${contentType}" \
       -H "Authorization: AWS ${s3Key}:${signature}" \
-      https://${s3Bucket}.${s3Endpoint}/${filename}
+      https://${s3Bucket}.${s3Endpoint}/$APP_NAME/${filename}
 }
 
 sign_s3_string() {
@@ -65,25 +61,16 @@ calculate_presigned_s3_url() {
 }
 
 upload_oom_heapdump_to_s3() {
-    usetempfile="$1"
-	#heapdumpfile=$PWD/oom_heapdump.hprof
-    heapdumpfile=/home/vcap/app/oom_heapdump.hprof
+    heapdumpfile=$1
     if [[ -e $heapdumpfile && -n "$JBPDIAG_AWS_BUCKET" ]]; then
-        filename="oom_heapdump_$(date +"%s").hprof.gz"
+        filename="$APP_NAME/oom_heapdump_$(date +"%s").hprof.gz"
         s3_presign_url=`calculate_presigned_s3_url $filename`
-        echo "$s3_presign_url" >> $PWD/oom_heapdump_download_urls
-        if [[ $usetempfile == 1 ]]; then
-            # usage of temporary file is allowed
-            echo "Compressing $heapdumpfile"
-            gzip $heapdumpfile
-            echo "Uploading to S3. Presigned access url: $s3_presign_url"
-            upload_to_s3 ${heapdumpfile}.gz $filename && rm ${heapdumpfile}.gz
-        else
-            echo "Calculating compressed size first to minimize disk space usage"
-            gzippedsize=`cat $heapdumpfile | gzip -c | wc -c | awk '{print $1}'`
-            echo "Compressing and uploading $gzippedsize bytes to S3. Presigned access url: $s3_presign_url"
-            cat $heapdumpfile | gzip -c | upload_stdin_to_s3 $filename $gzippedsize && rm $heapdumpfile
-        fi
+        echo "$s3_presign_url" >> oom_heapdump_download_urls
+		# usage of temporary file is allowed
+		echo "Compressing $heapdumpfile"
+		gzip $heapdumpfile
+		echo "Uploading to S3. Presigned access url: $s3_presign_url"
+		upload_to_s3 ${heapdumpfile}.gz
     fi
 }
 
@@ -112,6 +99,6 @@ upload_file_to_s3() {
 		
 		echo "Calculating $1 compressed size first to minimize disk space usage"
 		gzippedsize=`cat $statsfile | gzip -c | wc -c | awk '{print $1}'`
-		cat $statsfile | gzip -c | upload_stdin_to_s3 $filename $gzippedsize && rm $statsfile
+		cat $statsfile | gzip -c | upload_stdin_to_s3 $filename $gzippedsize
     fi
 }
