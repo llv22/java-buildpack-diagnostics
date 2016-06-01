@@ -66,8 +66,8 @@ calculate_presigned_s3_url() {
 
 upload_oom_heapdump_to_s3() {
     usetempfile="$1"
-	#heapdumpfile=$PWD/oom_heapdump.hprof
-    heapdumpfile=/home/vcap/app/oom_heapdump.hprof
+    heapdumpfile=$PWD/oom_heapdump.hprof
+    #heapdumpfile=/home/vcap/app/oom_heapdump.hprof
     if [[ -e $heapdumpfile && -n "$JBPDIAG_AWS_BUCKET" ]]; then
         filename="oom_heapdump_$(date +"%s").hprof.gz"
         s3_presign_url=`calculate_presigned_s3_url $filename`
