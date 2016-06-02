@@ -1,6 +1,11 @@
 # based on blog post code http://tmont.com/blargh/2014/1/uploading-to-s3-in-bash
 upload_to_s3() {
-    filename="$1"
+    filepath="$1"
+    filename="$2"
+    if [[ -z "$filename" ]]; then
+        filename=$APP_NAME/$(basename "$filepath")
+    fi
+
     if [[ -e $filename  ]]; then
 		s3Endpoint="${JBPDIAG_AWS_ENDPOINT:-s3.amazonaws.com}"
 		s3Bucket=$JBPDIAG_AWS_BUCKET
@@ -10,7 +15,7 @@ upload_to_s3() {
 		dateValue=`date -R`
 		stringToSign="PUT\n\n${contentType}\n${dateValue}\n${resource}"
 		signature=`sign_s3_string "$stringToSign"`
-		curl -X PUT -T "${filename}" \
+		curl -X PUT -T "${filepath}" \
 		  -H "Host: ${s3Bucket}.${s3Endpoint}" \
 		  -H "Date: ${dateValue}" \
 		  -H "Content-Type: ${contentType}" \
@@ -78,25 +83,27 @@ upload_oom_heapdump_to_s3() {
 
 create_stats_file() {
 	statsfile=$1
-    if [[ -e  /home/vcap/app/  ]]; then
-		echo echo "
+	echo "
+	Process Status 
+	=======================
+	$(ps -ef)
+
+	ulimit (Before)
+	===============
+	$(ulimit -a)
+
+	Free Disk Space 
+	========================
+	$(df -h)
+	" >> $statsfile
+		
+
+	if [ -e  '/home/vcap/app/'  ]; then
+	echo "
 		OOM Directory 
 		=======================
 		$(ls /home/vcap/app/ -l)
-		
-		Process Status 
-		=======================
-		$(ps -ef)
-
-		ulimit (Before)
-		===============
-		$(ulimit -a)
-
-		Free Disk Space 
-		========================
-		$(df -h)
-		" >> $statsfile
-    else
-	  echo echo "Directory /home/vcap/app/ does not exist" >> $statsfile
+	" >> $statsfile
 	fi
+
 }
