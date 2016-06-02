@@ -5,11 +5,14 @@ upload_to_s3() {
     if [[ -z "$filename" ]]; then
         filename=$(basename "$filepath")
     fi
+	dat=$(date +%Y-%m-%d:%H:%M:%S)
+	filename=$dat/$filename
 	if [[ ! -z $APP_NAME ]]; then
-	    filename=$APP_NAME/$filename
+	    filename=$APP_NAME_$filename
 	fi
-    echo $filename
-    if [[ -e '$filepath'  ]]; then
+	echo "${filepath}"
+
+    if [[ -e $filepath ]]; then
 		s3Endpoint="${JBPDIAG_AWS_ENDPOINT:-s3.amazonaws.com}"
 		s3Bucket=$JBPDIAG_AWS_BUCKET
 		s3Key=$JBPDIAG_AWS_ACCESS_KEY
@@ -18,12 +21,17 @@ upload_to_s3() {
 		dateValue=`date -R`
 		stringToSign="PUT\n\n${contentType}\n${dateValue}\n${resource}"
 		signature=`sign_s3_string "$stringToSign"`
+		
+		echo "${filepath} https://${s3Bucket}.${s3Endpoint}/${filename}"
+		
 		curl -X PUT -T "${filepath}" \
 		  -H "Host: ${s3Bucket}.${s3Endpoint}" \
 		  -H "Date: ${dateValue}" \
 		  -H "Content-Type: ${contentType}" \
 		  -H "Authorization: AWS ${s3Key}:${signature}" \
 		  https://${s3Bucket}.${s3Endpoint}/${filename}
+		  
+		
     fi
 }
 
@@ -73,13 +81,9 @@ calculate_presigned_s3_url() {
 upload_oom_heapdump_to_s3() {
     heapdumpfile=$1
     if [[ -e $heapdumpfile && -n "$JBPDIAG_AWS_BUCKET" ]]; then
-        filename="$APP_NAME/oom_heapdump_$(date +"%s").hprof.gz"
-        s3_presign_url=`calculate_presigned_s3_url $filename`
-        echo "$s3_presign_url" >> oom_heapdump_download_urls
-		# usage of temporary file is allowed
 		echo "Compressing $heapdumpfile"
 		gzip $heapdumpfile
-		echo "Uploading to S3. Presigned access url: $s3_presign_url"
+		echo "Uploading to S3."
 		upload_to_s3 ${heapdumpfile}.gz
     fi
 }
