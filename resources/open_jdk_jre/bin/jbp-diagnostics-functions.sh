@@ -3,10 +3,13 @@ upload_to_s3() {
     filepath="$1"
     filename="$2"
     if [[ -z "$filename" ]]; then
-        filename=$APP_NAME/$(basename "$filepath")
+        filename=$(basename "$filepath")
     fi
-
-    if [[ -e $filename  ]]; then
+	if [[ ! -z $APP_NAME ]]; then
+	    filename=$APP_NAME/$filename
+	fi
+    echo $filename
+    if [[ -e '$filepath'  ]]; then
 		s3Endpoint="${JBPDIAG_AWS_ENDPOINT:-s3.amazonaws.com}"
 		s3Bucket=$JBPDIAG_AWS_BUCKET
 		s3Key=$JBPDIAG_AWS_ACCESS_KEY
