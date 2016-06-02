@@ -5,12 +5,12 @@ upload_to_s3() {
     if [[ -z "$filename" ]]; then
         filename=$(basename "$filepath")
     fi
+	
 	dat=$(date +%Y-%m-%d:%H:%M:%S)
 	filename=$dat/$filename
 	if [[ ! -z $APP_NAME ]]; then
 	    filename=$APP_NAME_$filename
 	fi
-	echo "${filepath}"
 
     if [[ -e $filepath ]]; then
 		s3Endpoint="${JBPDIAG_AWS_ENDPOINT:-s3.amazonaws.com}"
@@ -22,16 +22,12 @@ upload_to_s3() {
 		stringToSign="PUT\n\n${contentType}\n${dateValue}\n${resource}"
 		signature=`sign_s3_string "$stringToSign"`
 		
-		echo "${filepath} https://${s3Bucket}.${s3Endpoint}/${filename}"
-		
 		curl -X PUT -T "${filepath}" \
 		  -H "Host: ${s3Bucket}.${s3Endpoint}" \
 		  -H "Date: ${dateValue}" \
 		  -H "Content-Type: ${contentType}" \
 		  -H "Authorization: AWS ${s3Key}:${signature}" \
 		  https://${s3Bucket}.${s3Endpoint}/${filename}
-		  
-		
     fi
 }
 
