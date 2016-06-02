@@ -7,9 +7,9 @@ upload_to_s3() {
     fi
 	
 	dat=$(date +%Y-%m-%d:%H:%M:%S)
-	filename=$dat/$filename
-	if [[ ! -z $APP_NAME ]]; then
-	    filename=$APP_NAME_$filename
+	filename=$dat_$filename
+	if [ ! -z ${APP_NAME+x} ]; then
+	    filename=$APP_NAME/$filename
 	fi
 
     if [[ -e $filepath ]]; then
