@@ -22,9 +22,10 @@ set -e
 SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 . $SCRIPTDIR/jbp-diagnostics-functions.sh
 
-create_stats_file $PWD/$APP_NAME/stats.txt
-upload_file_to_s3 $PWD/$APP_NAME/stats.txt
-upload_file_to_s3 /home/vcap/app/jvm-gc.log
+
+create_stats_file /home/vcap/app/stats.txt
+upload_to_s3 /home/vcap/app/stats.txt
+upload_to_s3 /home/vcap/app/jvm-gc.log
 upload_oom_heapdump_to_s3 /home/vcap/app/oom_heapdump.hprof
 
 

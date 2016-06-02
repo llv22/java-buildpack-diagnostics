@@ -1,20 +1,22 @@
 # based on blog post code http://tmont.com/blargh/2014/1/uploading-to-s3-in-bash
 upload_to_s3() {
     filename="$1"
-    s3Endpoint="${JBPDIAG_AWS_ENDPOINT:-s3.amazonaws.com}"
-    s3Bucket=$JBPDIAG_AWS_BUCKET
-    s3Key=$JBPDIAG_AWS_ACCESS_KEY
-    contentType="application/octet-stream"
-    resource="/${s3Bucket}/$filename"
-    dateValue=`date -R`
-    stringToSign="PUT\n\n${contentType}\n${dateValue}\n${resource}"
-    signature=`sign_s3_string "$stringToSign"`
-    curl -X PUT -T "${filename}" \
-      -H "Host: ${s3Bucket}.${s3Endpoint}" \
-      -H "Date: ${dateValue}" \
-      -H "Content-Type: ${contentType}" \
-      -H "Authorization: AWS ${s3Key}:${signature}" \
-      https://${s3Bucket}.${s3Endpoint}/$APP_NAME/${filename}
+    if [[ -e $filename  ]]; then
+		s3Endpoint="${JBPDIAG_AWS_ENDPOINT:-s3.amazonaws.com}"
+		s3Bucket=$JBPDIAG_AWS_BUCKET
+		s3Key=$JBPDIAG_AWS_ACCESS_KEY
+		contentType="application/octet-stream"
+		resource="/${s3Bucket}/$filename"
+		dateValue=`date -R`
+		stringToSign="PUT\n\n${contentType}\n${dateValue}\n${resource}"
+		signature=`sign_s3_string "$stringToSign"`
+		curl -X PUT -T "${filename}" \
+		  -H "Host: ${s3Bucket}.${s3Endpoint}" \
+		  -H "Date: ${dateValue}" \
+		  -H "Content-Type: ${contentType}" \
+		  -H "Authorization: AWS ${s3Key}:${signature}" \
+		  https://${s3Bucket}.${s3Endpoint}/${filename}
+    fi
 }
 
 sign_s3_string() {
@@ -76,29 +78,25 @@ upload_oom_heapdump_to_s3() {
 
 create_stats_file() {
 	statsfile=$1
-	echo echo "
-	Process Status (Before)
-	=======================
-	$(ps -ef)
-
-	ulimit (Before)
-	===============
-	$(ulimit -a)
-
-	Free Disk Space (Before)
-	========================
-	$(df -h)
-	" >> $statsfile
-}
-
-upload_file_to_s3() {
-    echo "Copying mem stats file"
-	statsfile=$1
-    if [[ -n "$JBPDIAG_AWS_BUCKET" ]]; then
-        filename="oom_$(date +"%s")_file.txt.gz"
+    if [[ -e  /home/vcap/app/  ]]; then
+		echo echo "
+		OOM Directory 
+		=======================
+		$(ls /home/vcap/app/ -l)
 		
-		echo "Calculating $1 compressed size first to minimize disk space usage"
-		gzippedsize=`cat $statsfile | gzip -c | wc -c | awk '{print $1}'`
-		cat $statsfile | gzip -c | upload_stdin_to_s3 $filename $gzippedsize
-    fi
+		Process Status 
+		=======================
+		$(ps -ef)
+
+		ulimit (Before)
+		===============
+		$(ulimit -a)
+
+		Free Disk Space 
+		========================
+		$(df -h)
+		" >> $statsfile
+    else
+	  echo echo "Directory /home/vcap/app/ does not exist" >> $statsfile
+	fi
 }
