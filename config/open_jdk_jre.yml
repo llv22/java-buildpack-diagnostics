@@ -25,7 +25,7 @@ memory_calculator:
   stack_threads: 
   memory_sizes:
     heap: 200m..
-    metaspace: 48m..
+    metaspace: 64m..
     native: 32m..
     permgen: 48m..
     stack: 16m..
