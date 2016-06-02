@@ -7,10 +7,12 @@ upload_to_s3() {
     fi
 	
 	dat=$(date +%Y-%m-%d:%H:%M:%S)
-	filename=$dat_$filename
+	filename=${dat}_${filename}
 	if [ ! -z ${APP_NAME+x} ]; then
 	    filename=$APP_NAME/$filename
 	fi
+	
+	echo $filename
 
     if [[ -e $filepath ]]; then
 		s3Endpoint="${JBPDIAG_AWS_ENDPOINT:-s3.amazonaws.com}"
