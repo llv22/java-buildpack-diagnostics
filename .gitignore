@@ -4,3 +4,9 @@
 build/
 coverage
 doc
+
+# local uploaded cache
+ThreadHeapStackStrace.log
+ThreadHeapStackStrace_download_urls
+oom_heapdump.hprof
+oom_heapdump_download_urls
