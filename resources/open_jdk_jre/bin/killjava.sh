@@ -25,6 +25,10 @@ SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 # create_stats_file /home/vcap/app/stats.txt
 # upload_to_s3 /home/vcap/app/stats.txt
+echo "
+	Process Status 
+	" >> /home/vcap/app/hello.txt
+upload_to_s3 /home/vcap/app/hello.txt
 upload_to_s3 /home/vcap/app/jvm-gc.log
 upload_oom_heapdump_to_s3 /home/vcap/app/oom_heapdump.hprof
 upload_oom_heapdump_to_s3 /home/vcap/app/ThreadHeapStackStrace.log
