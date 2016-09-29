@@ -52,6 +52,7 @@ module JavaBuildpack
         add_preformatted_options "-agentpath:#{qualify_path path}=" + props.map { |k, v| "#{k}=#{v}" }.join(',')
       end
 
+      ## adding path without valiation to just surpass
       # Adds a +agentpath+ entry to the +JAVA_OPTS+.  Prepends +$PWD+ to the path (relative to the droplet root) to
       # ensure that the path is always accurate.
       #
@@ -60,7 +61,7 @@ module JavaBuildpack
       # @return [JavaOpts]     +self+ for chaining
       def add_agentpath_with_props_without_check(path, props)
         add_preformatted_options "-agentpath:$PWD/#{path}=" + props.map { |k, v| "#{k}=#{v}" }.join(',')
-      en
+      end
 
       # Adds an +agentpath+ entry to the +JAVA_OPTS+. Prepends +$PWD+ to the path (relative to the droplet root) to
       # ensure that the path is always accurate.
