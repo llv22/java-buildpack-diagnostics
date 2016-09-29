@@ -60,7 +60,7 @@ module JavaBuildpack
           .push('-XX:+PrintGCDetails')
           .push('-Xloggc:/home/vcap/app/jvm-gc.log')
           .push('-XX:NativeMemoryTracking=detail')
-          .push('-agentpath:'+libjvmkill.to_s+'=time=10,count=2,printHeapHistogram=1')
+          #.push('-agentpath:'+libjvmkill.to_s+'=time=10,count=2,printHeapHistogram=1')
           .add_option('-XX:HeapDumpPath', '/home/vcap/app/oom_heapdump.hprof')
           .add_option('-XX:OnOutOfMemoryError', killjava)
       end
@@ -70,7 +70,7 @@ module JavaBuildpack
       # https://github.com/cloudfoundry/jvmkill script support
       # see : libjvmkill
       def libjvmkill
-        return @droplet.sandbox + 'bin/libjvmkill-master.so'
+        return @droplet.sandbox + 'bin/libjvmkill.so'
       end
 
       # killjava script location
