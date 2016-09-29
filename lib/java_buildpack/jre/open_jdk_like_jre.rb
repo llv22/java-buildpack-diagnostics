@@ -70,7 +70,7 @@ module JavaBuildpack
       # https://github.com/cloudfoundry/jvmkill script support
       # see : libjvmkill
       def libjvmkill
-        @droplet.sandbox + 'bin/libjvmkill-master.so'
+        return @droplet.sandbox + 'bin/libjvmkill-master.so'
       end
 
       # killjava script location
