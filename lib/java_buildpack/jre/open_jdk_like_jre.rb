@@ -53,9 +53,9 @@ module JavaBuildpack
 
       # (see JavaBuildpack::Component::BaseComponent#release)
       def release
+        props = {'time' => 10, 'count' => 2, 'printHeapHistogram' => 1}
         @droplet.java_opts
           .add_system_property('java.io.tmpdir', '$TMPDIR')
-          .push('-agentpath:'+libjvmkill.to_s+'=time=10,count=2,printHeapHistogram=1')
           .push('-XX:+HeapDumpOnOutOfMemoryError')
           .push('-XX:+PrintGCDateStamps')
           .push('-XX:+PrintGCDetails')
@@ -63,6 +63,7 @@ module JavaBuildpack
           .push('-XX:NativeMemoryTracking=detail')
           .add_option('-XX:HeapDumpPath', '/home/vcap/app/oom_heapdump.hprof')
           .add_option('-XX:OnOutOfMemoryError', killjava)
+          .add_agentpath_with_props(libjvmkill, props)
       end
 
       private
@@ -70,8 +71,8 @@ module JavaBuildpack
       # https://github.com/cloudfoundry/jvmkill script support
       # see : libjvmkill
       def libjvmkill
-        return '/home/vcap/app/.java-buildpack/open_jdk_jre/bin/libjvmkill.so'
-        # @droplet.sandbox + 'bin/libjvmkill.so'
+        #return '/home/vcap/app/.java-buildpack/open_jdk_jre/bin/libjvmkill.so'
+        @droplet.sandbox + 'bin/libjvmkill.so'
       end
 
       # killjava script location
