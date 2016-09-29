@@ -60,7 +60,7 @@ module JavaBuildpack
           .push('-XX:+PrintGCDetails')
           .push('-Xloggc:/home/vcap/app/jvm-gc.log')
           .push('-XX:NativeMemoryTracking=detail')
-          .add_option('-agentpath:'+libjvmkill+'=time=10,count=2,printHeapHistogram=1')
+          .push('-agentpath:'+libjvmkill+'=time=10,count=2,printHeapHistogram=1')
           .add_option('-XX:HeapDumpPath', '/home/vcap/app/oom_heapdump.hprof')
           .add_option('-XX:OnOutOfMemoryError', killjava)
       end
