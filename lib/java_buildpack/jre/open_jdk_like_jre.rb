@@ -64,7 +64,7 @@ module JavaBuildpack
           .push('-XX:NativeMemoryTracking=detail')
           .add_option('-XX:HeapDumpPath', '/home/vcap/app/oom_heapdump.hprof')
           .add_option('-XX:OnOutOfMemoryError', killjava)
-          .add_agentpath_with_props(libjvmkill, props)
+          .add_agentpath_with_props(Pathname(libjvmkill), props)
       end
 
       private
