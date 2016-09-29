@@ -55,7 +55,7 @@ module JavaBuildpack
       def release
         @droplet.java_opts
           .add_system_property('java.io.tmpdir', '$TMPDIR')
-          .add_option('JAVA_TOOL_OPTIONS','-agentpath:'+libjvmkill.to_s+'=time=10,count=2,printHeapHistogram=1')
+          .add_system_property('JAVA_TOOL_OPTIONS','-agentpath:'+libjvmkill.to_s+'=time=10,count=2,printHeapHistogram=1')
           .push('-XX:+HeapDumpOnOutOfMemoryError')
           .push('-XX:+PrintGCDateStamps')
           .push('-XX:+PrintGCDetails')
