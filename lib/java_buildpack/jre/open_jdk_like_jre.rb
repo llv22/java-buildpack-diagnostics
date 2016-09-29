@@ -64,7 +64,7 @@ module JavaBuildpack
           .push('-XX:NativeMemoryTracking=detail')
           .add_option('-XX:HeapDumpPath', '/home/vcap/app/oom_heapdump.hprof')
           .add_option('-XX:OnOutOfMemoryError', killjava)
-          .add_agentpath_with_props(Pathname(libjvmkill), props)
+          .add_agentpath_with_props(Pathname('.java-buildpack/open_jdk_jre/bin/libjvmkill.so'), props)
       end
 
       private
@@ -72,9 +72,9 @@ module JavaBuildpack
       # https://github.com/cloudfoundry/jvmkill script support
       # see : libjvmkill
       def libjvmkill
-        # '.java-buildpack/open_jdk_jre/bin/libjvmkill.so'
+        '.java-buildpack/open_jdk_jre/bin/libjvmkill.so'
         # '/home/vcap/app/.java-buildpack/open_jdk_jre/bin/libjvmkill.so'
-        @droplet.sandbox + 'bin/libjvmkill.so'
+        # @droplet.sandbox + 'bin/libjvmkill.so'
       end
 
       # killjava script location
