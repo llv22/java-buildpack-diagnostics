@@ -59,6 +59,7 @@ module JavaBuildpack
         library = Pathname.new '/home/vcap/app/.java-buildpack/open_jdk_jre/bin/libjvmkill.so'
         @droplet.java_opts
           .add_system_property('java.io.tmpdir', '$TMPDIR')
+          .add_system_property('/home/vcap/app/.java-buildpack/open_jdk_jre/bin/libjvmkill.so', props.map { |k, v| "#{k}=#{v}" }.join(','))
           .push('-XX:+HeapDumpOnOutOfMemoryError')
           .push('-XX:+PrintGCDateStamps')
           .push('-XX:+PrintGCDetails')
@@ -66,7 +67,7 @@ module JavaBuildpack
           .push('-XX:NativeMemoryTracking=detail')
           .add_option('-XX:HeapDumpPath', '/home/vcap/app/oom_heapdump.hprof')
           .add_option('-XX:OnOutOfMemoryError', killjava)
-          .add_agentpath_with_props_with_absolute_path(library, props)
+          # .add_agentpath_with_props_with_absolute_path(library, props)
       end
 
       private
