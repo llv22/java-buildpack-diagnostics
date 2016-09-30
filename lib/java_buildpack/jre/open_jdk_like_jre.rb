@@ -55,8 +55,8 @@ module JavaBuildpack
       def release
         # see also https://github.com/cloudfoundry/java-buildpack/blob/master/lib/java_buildpack/framework/dyna_trace_agent.rb
         # see also 
-        props = {time=>10, count=>2, printHeapHistogram=>1}
-        library = Pathname.new '$PWD/.java-buildpack/open_jdk_jre/bin/libjvmkill.so'
+        props = {'time'=>10, 'count'=>2, 'printHeapHistogram'=>1}
+        library = Pathname.new '.java-buildpack/open_jdk_jre/bin/libjvmkill.so'
         @droplet.java_opts
           .add_system_property('java.io.tmpdir', '$TMPDIR')
           .push('-XX:+HeapDumpOnOutOfMemoryError')
@@ -66,7 +66,7 @@ module JavaBuildpack
           .push('-XX:NativeMemoryTracking=detail')
           .add_option('-XX:HeapDumpPath', '/home/vcap/app/oom_heapdump.hprof')
           .add_option('-XX:OnOutOfMemoryError', killjava)
-          .add_agentpath_with_props(library, 'time'=>10, 'count'=>2, 'printHeapHistogram'=>1)
+          .add_agentpath_with_props_without_check(library, props)
       end
 
       private
